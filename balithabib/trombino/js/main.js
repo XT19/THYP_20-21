@@ -33,11 +33,12 @@ const RESPONSE_TO_IMPORTANCE_VALUE = {
     "je suis accro": 10
 };
 
-let facets;
+let facets, dataForm;
 const data = d3.queue()
     .defer(d3.csv, url)
     .awaitAll(function (error, result) {
         if (error) throw error;
+        dataForm = result[0];
         populateFacets(result[0]);
     });
 
@@ -66,6 +67,35 @@ function populateFacets(result) {
         id++;
     });
     console.log(facets);
+
+    createViewFacet();
+    createStudentCard();
+}
+
+function loadImage(url) {
+    let urlParam = new URLSearchParams(new URL(url).search);
+    return 'https://drive.google.com/uc?id=' + urlParam.get('id') + '&export=download';
+}
+
+function createViewFacet() {
+
+}
+
+function createStudentCard() {
+    d3.select('#studentsCards')
+        .selectAll(".col-sm-4 mb-12")
+        .data(dataForm).enter()
+        .append('div').attr('class', 'col-sm-4 mb-12').style('margin-bottom', '10px')
+        .append('div').attr('class', 'card')
+        .append('img').attr('class', 'imgStudent')
+        .attr('id', (d, i) => 'imgCard' + i)
+        .attr('src', d => loadImage(d['Votre photo']))
+        .append('div').attr('class', 'card-body')
+        .append('h4').attr('class', 'card-title')
+        .text(d => d['Votre prénom'].toLowerCase())
+        .append('h5').attr('class', 'card-title')
+        .text(d => d['Votre nom'].toLowerCase())
+        .append('h6').text(d => d['Dans quel parcours êtes vous inscris ?']);
 }
 
 function getImportance(response) {
